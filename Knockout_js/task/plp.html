@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src = "https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.1.0.js" type = "text/javascript"></script>
+    <style>
+
+        /* General Styles */
+        body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        }
+
+        .container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        }
+
+        /* Navbar Styles */
+        nav {
+        background-color: #333;
+        color: #fff;
+        padding: 10px 20px;
+        }
+
+        ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        }
+
+        li {
+        display: inline-block;
+        margin-right: 20px;
+        font-size: 18px;
+        }
+
+        #navbar {
+        color: white;
+        text-decoration: none;
+        }
+
+        .cart-icon {
+        float: right;
+        }
+
+        /* Product Item Styles */
+        .container > div {
+        border: 1px solid #ccc;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        }
+
+        .container img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+        }
+
+        .container p {
+        margin: 0;
+        }
+
+        .container button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        }
+
+        .container button:hover {
+        background-color: #555;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+        .container {
+            grid-template-columns: 1fr;
+        }
+        }
+
+        .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+
+        .pagination button {
+        padding: 5px 10px;
+        margin: 0 5px;
+        border: 1px solid #ccc;
+        background-color: #f7f7f7;
+        cursor: pointer;
+        }
+
+        .pagination .prev,
+        .pagination .next {
+        font-weight: bold;
+        }
+
+        .pagination .page-number.active {
+        background-color: #ccc;
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+          <li ><a href="#" id="navbar">Home</a></li>
+          <li data-bind="text: Counter, click: showdetails" style="cursor: pointer;">Cart: 0</li>
+        </ul>
+    </nav> 
+    <div class="container" data-bind="foreach: pagedProducts">
+        <div>
+            <img data-bind="attr: { src: image }" alt="canon" />
+            <p data-bind="text: id"></p>
+            <p data-bind="text: product"></p>
+            <p data-bind="text: '₹' + price"></p>
+            <button data-bind="click: $parent.additem, click: function() { $root.additem($data); }">Add to cart</button>
+            <button data-bind="click: function() { $root.showdata($data);}, ">Show product</button>
+        </div>
+    </div>
+    <div class="pagination">
+        <button class="prev" data-bind="click: previousPage, enable: currentPageIndex() > 0">Previous</button>
+       
+        <span data-bind="foreach: paginationNumbers"> 
+        
+          <button class="page-number" data-bind="text: $data, click: $root.goToPage, css: { active: $root.isActivePage($data) }"></button>
+        </span>
+        <button class="next" data-bind="click: nextPage, enable: currentPageIndex() < maxPageIndex()">Next</button>
+      </div>
+    </div>
+
+
+      <script>
+        function ProductViewModel(id, product, price, image) {
+            this.id = id;
+            this.product = product;
+            this.price = price;
+            this.image = image;
+        }
+
+        function AppViewModel() {
+            var self = this;
+            self.Counter = ko.observable(0);
+            self.cartItems = ko.observableArray([]);
+            self.displayitems = ko.observableArray([]);
+            self.products = ko.observableArray([
+                new ProductViewModel(1, "Canon EOS 5D Mark IV", 80000, "../Canon EOS 5D Mark IV.png"),
+                new ProductViewModel(2, "Apple Airpods 3rd Generation", 20500, "../MME73_AV1.jpg"),
+                new ProductViewModel(3, "Redmi Note 12 Pro+ 5G", 29000, "../redmi-note-12.webp"),
+                new ProductViewModel(4, "Television", 12000, "../television.jpg"),
+                new ProductViewModel(5, "Canon EOS 5D Mark IV", 80000, "../Canon EOS 5D Mark IV.png"),
+                new ProductViewModel(6, "Redmi Note 12 Pro+ 5G", 29000, "../redmi-note-12.webp"),
+                new ProductViewModel(7, "Television", 12000, "../television.jpg"),
+                new ProductViewModel(8, "Apple Airpods 3rd Generation", 20500, "../MME73_AV1.jpg"),
+                new ProductViewModel(9, "Canon EOS 5D Mark IV", 80000, "../Canon EOS 5D Mark IV.png"),
+                new ProductViewModel(10, "Apple Airpods 3rd Generation", 20500, "../MME73_AV1.jpg"),
+                new ProductViewModel(11, "Redmi Note 12 Pro+ 5G", 29000, "../redmi-note-12.webp"),
+                new ProductViewModel(12, "Television", 12000, "../television.jpg"),
+                new ProductViewModel(13, "Canon EOS 5D Mark IV", 80000, "../Canon EOS 5D Mark IV.png"),
+                new ProductViewModel(14, "Redmi Note 12 Pro+ 5G", 29000, "../redmi-note-12.webp"),
+                new ProductViewModel(15, "Television", 12000, "../television.jpg"),
+                new ProductViewModel(16, "Apple Airpods 3rd Generation", 20500, "../MME73_AV1.jpg"),
+                
+            ]);
+
+            this.additem = function(products) {
+                var count = self.Counter();
+                self.Counter(count + 1);
+                self.cartItems.push({
+                id: products.id,
+                image: products.image,
+                name: products.product,
+                price: products.price
+            });
+            // Store cartItems in local storage
+            localStorage.setItem('cartItems', JSON.stringify(self.cartItems()));
+            };
+
+            self.showdata= function(products){
+            window.location.href="product.html"
+            localStorage.setItem('productDisplay',JSON.stringify(products))
+            }
+
+            self.showdetails= function(){
+                window.location.href="cartitems.html"
+            }
+
+            self.pageSize = 4;
+            self.currentPageIndex = ko.observable(0);
+
+            self.maxPageIndex = ko.computed(function () {
+                console.log(self.pageSize)
+            return Math.ceil(self.products().length / self.pageSize) - 1;
+            });
+
+
+            self.pagedProducts = ko.computed(function () {
+            var startIndex = self.pageSize * self.currentPageIndex();
+            return self.products().slice(startIndex, startIndex + self.pageSize);
+            });
+
+            self.paginationNumbers = ko.computed(function () {
+            var pages = [];
+            for (var i = 0; i <= self.maxPageIndex(); i++) {
+                pages.push(i + 1);
+            }
+            return pages;
+            });
+
+            self.previousPage = function () {
+            if (self.currentPageIndex() > 0) {
+                self.currentPageIndex(self.currentPageIndex() - 1);
+            
+            }};
+
+            self.nextPage = function () {
+            if (self.currentPageIndex() < self.maxPageIndex()) {
+                self.currentPageIndex(self.currentPageIndex() + 1);
+            }};
+
+            self.goToPage = function (pageIndex) {
+            self.currentPageIndex(pageIndex - 1);
+            };
+
+            self.isActivePage = function (pageIndex) {
+            return self.currentPageIndex() === (pageIndex - 1);
+            };
+
+
+        }
+
+        ko.applyBindings(new AppViewModel());
+    </script>
+</body>
+</html>

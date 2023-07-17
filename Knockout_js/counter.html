@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Counter Example</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .container button {
+            font-size: 20px;
+            padding: 10px 20px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .container span {
+            font-size: 40px;
+            margin: 0 10px;
+        }
+    </style>
+    <script src = "https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.1.0.js" type = "text/javascript"></script>
+</head>
+<body>
+    <div class="container">
+        <button data-bind="click: increase">+</button>
+        <span data-bind="text: Counter">0</span>
+        <button data-bind="click: decrease">-</button>
+    </div>
+    <script>
+        function AppviewModel(){
+            this.Counter= ko.observable(0);
+            this.increase= function(){
+                var count= this.Counter();
+                this.Counter(count+1);
+            }
+            this.decrease= function(){
+                var count= this.Counter();
+                if(count>0)
+                    this.Counter(count-1);
+            }
+        }
+        ko.applyBindings(new AppviewModel())
+    </script>
+</body>
+</html>
