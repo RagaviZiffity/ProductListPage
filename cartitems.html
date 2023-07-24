@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cart Details</title>
+  <style>
+    *{
+        font-size: x-large;
+        font-family: Arial, Helvetica, sans-serif;
+        text-shadow: 2px 2px 7px slategrey;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: orange ;
+      }
+  
+      h1 {
+        text-align: center;
+      }
+  
+      div {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+  
+      h3 {
+        margin-top: 0;
+      }
+  
+      p {
+        margin: 10px 0;
+      }
+  
+      img {
+        max-width: 100%;
+        height: auto;
+        margin-top: 20px;
+      }
+  </style>
+ <script data-main="cartitems" src="customFolder/require.js"></script>
+</head>
+<body>
+  <h1>Cart Details</h1>
+  <div data-bind="foreach: cartItems">
+  <h3>sku: <span data-bind="text: id"></span></h3>
+  <p id="productDescription" >Product: <span data-bind="text: name"></span></p>
+  <p id="productPrice" >Price: ₹<span data-bind="text: price"></span></p>
+  <img id="productImage" width="200" height="100" data-bind="attr: { src: image }">
+  <p id="quantity" >Quantity -<span data-bind="text: quantity"></span></p>
+  <hr>
+  </div>
+</body>
+</html>
